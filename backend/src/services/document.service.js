@@ -28,7 +28,7 @@ class DocumentService {
       uploadedAt: new Date().toISOString(),
       owner: normalizedOwner,
       storedName: file.filename,
-      mimeType: file.mimetype || "application/octet-stream",
+      mimeType: this.normalizeMimeType(file.mimetype),
       storagePath: file.path,
     };
 
@@ -84,6 +84,14 @@ class DocumentService {
     const error = new Error(message);
     error.statusCode = statusCode;
     return error;
+  }
+
+  normalizeMimeType(mimeType) {
+    const isValidMimeType =
+      typeof mimeType === "string" &&
+      /^[\w!#$&^_.+-]+\/[\w!#$&^_.+-]+$/.test(mimeType);
+
+    return isValidMimeType ? mimeType : "application/octet-stream";
   }
 }
 

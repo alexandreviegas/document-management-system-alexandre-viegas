@@ -1,11 +1,21 @@
-const fs = require("node:fs");
+const path = require("node:path");
 
 class DocumentRepository {
-  constructor() {
+  constructor(storageDirectory) {
     this.documents = new Map();
+    this.storageDirectory = path.resolve(storageDirectory);
   }
 
   save(document) {
+    const storagePath = path.resolve(document.storagePath);
+    const relativePath = path.relative(this.storageDirectory, storagePath);
+
+    if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+      const error = new Error("O arquivo está fora do diretório de storage.");
+      error.statusCode = 500;
+      throw error;
+    }
+
     this.documents.set(document.id, document);
     return document;
   }
@@ -28,10 +38,6 @@ class DocumentRepository {
     const document = this.documents.get(id);
     this.documents.delete(id);
     return document || null;
-  }
-
-  fileExists(document) {
-    return Boolean(document && fs.existsSync(document.storagePath));
   }
 }
 

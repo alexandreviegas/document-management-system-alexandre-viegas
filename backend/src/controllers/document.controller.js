@@ -35,6 +35,7 @@ class DocumentController {
         "Content-Type": document.mimeType,
         "Content-Disposition": `attachment; filename="${this.escapeFilename(document.originalName)}"`,
         "Content-Length": size,
+        "X-Content-Type-Options": "nosniff",
       });
       res.sendFile(document.storagePath, (error) => {
         if (error) {

@@ -31,7 +31,7 @@ const upload = multer({
   },
 });
 
-const repository = new DocumentRepository();
+const repository = new DocumentRepository(storageDirectory);
 const service = new DocumentService(repository);
 const controller = new DocumentController(service);
 const router = express.Router();

@@ -11,6 +11,7 @@
 // usando multer com diskStorage. Não utilize provedores externos.
 
 const express = require("express");
+const multer = require("multer");
 const documentRoutes = require("./routes/document.routes");
 
 const app = express();
@@ -36,7 +37,13 @@ app.use((error, req, res, next) => {
       .json({ error: "O tamanho máximo do arquivo foi excedido." });
   }
 
-  const statusCode = error.statusCode || 500;
+  if (error instanceof multer.MulterError) {
+    return res
+      .status(400)
+      .json({ error: "A requisição multipart é inválida." });
+  }
+
+  const statusCode = error.statusCode || error.status || 500;
   const message =
     statusCode >= 500 ? "Falha interna do servidor." : error.message;
   return res.status(statusCode).json({ error: message });

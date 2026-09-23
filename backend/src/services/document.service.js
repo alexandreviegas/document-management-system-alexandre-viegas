@@ -5,19 +5,19 @@ class DocumentService {
     this.documentRepository = documentRepository;
   }
 
-  createDocument(file, owner) {
+  async createDocument(file, owner) {
     if (!file) {
       throw this.createError("O campo file é obrigatório.", 400);
     }
 
     const normalizedOwner = typeof owner === "string" ? owner.trim() : "";
     if (!normalizedOwner) {
-      this.removeUploadedFile(file);
+      await this.removeUploadedFile(file);
       throw this.createError("O campo owner é obrigatório.", 400);
     }
 
     if (file.size <= 0) {
-      this.removeUploadedFile(file);
+      await this.removeUploadedFile(file);
       throw this.createError("O arquivo não pode estar vazio.", 400);
     }
 
@@ -35,7 +35,7 @@ class DocumentService {
     try {
       return this.documentRepository.save(document);
     } catch (error) {
-      this.removeUploadedFile(file);
+      await this.removeUploadedFile(file);
       throw error;
     }
   }
@@ -50,17 +50,33 @@ class DocumentService {
       throw this.createError("Documento não encontrado.", 404);
     }
 
-    if (!this.documentRepository.fileExists(document)) {
+    let stats;
+    try {
+      stats = await fs.stat(document.storagePath);
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        throw this.createError("Arquivo do documento não encontrado.", 404);
+      }
+
+      throw error;
+    }
+
+    if (!stats.isFile()) {
       throw this.createError("Arquivo do documento não encontrado.", 404);
     }
 
-    const stats = await fs.stat(document.storagePath);
     return { document, size: stats.size };
   }
 
-  removeUploadedFile(file) {
+  async removeUploadedFile(file) {
     if (file?.path) {
-      fs.unlink(file.path).catch(() => {});
+      try {
+        await fs.unlink(file.path);
+      } catch (error) {
+        if (error.code !== "ENOENT") {
+          throw error;
+        }
+      }
     }
   }
 

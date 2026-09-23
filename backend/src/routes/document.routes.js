@@ -11,9 +11,7 @@ const DocumentController = require("../controllers/document.controller");
 const storageDirectory = process.env.STORAGE_DIR
   ? path.resolve(process.env.STORAGE_DIR)
   : path.resolve(__dirname, "../../storage");
-const maximumFileSize = Number(
-  process.env.MAX_FILE_SIZE_BYTES || 10 * 1024 * 1024,
-);
+const maximumFileSize = getMaximumFileSize();
 
 fs.mkdirSync(storageDirectory, { recursive: true });
 
@@ -24,7 +22,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: maximumFileSize },
+  limits: {
+    fileSize: maximumFileSize,
+    fieldSize: 256,
+    fields: 1,
+    parts: 3,
+    headerPairs: 2000,
+  },
 });
 
 const repository = new DocumentRepository();
@@ -35,5 +39,17 @@ const router = express.Router();
 router.post("/upload", upload.single("file"), controller.upload);
 router.get("/documents", controller.list);
 router.get("/documents/:id/download", controller.download);
+
+function getMaximumFileSize() {
+  const configuredValue = process.env.MAX_FILE_SIZE_BYTES;
+  const value =
+    configuredValue === undefined ? 10 * 1024 * 1024 : Number(configuredValue);
+
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error("MAX_FILE_SIZE_BYTES deve ser um inteiro positivo.");
+  }
+
+  return value;
+}
 
 module.exports = router;

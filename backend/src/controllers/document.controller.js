@@ -6,9 +6,9 @@ class DocumentController {
     this.download = this.download.bind(this);
   }
 
-  upload(req, res, next) {
+  async upload(req, res, next) {
     try {
-      const document = this.documentService.createDocument(
+      const document = await this.documentService.createDocument(
         req.file,
         req.body.owner,
       );
@@ -37,7 +37,7 @@ class DocumentController {
         "Content-Length": size,
       });
       res.sendFile(document.storagePath, (error) => {
-        if (error && !res.headersSent) {
+        if (error) {
           next(error);
         }
       });

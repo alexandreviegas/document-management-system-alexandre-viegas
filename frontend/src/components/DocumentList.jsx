@@ -1,4 +1,4 @@
-import DownloadButton from './DownloadButton';
+import DownloadButton from "./DownloadButton";
 
 export default function DocumentList({ documents, isLoading, error, onRetry }) {
   return (
@@ -8,7 +8,9 @@ export default function DocumentList({ documents, isLoading, error, onRetry }) {
           <span className="eyebrow">Arquivo vivo</span>
           <h2>Seus documentos</h2>
         </div>
-        <span className="document-count">{documents.length.toString().padStart(2, '0')}</span>
+        <span className="document-count">
+          {documents.length.toString().padStart(2, "0")}
+        </span>
       </div>
 
       {isLoading && <p className="empty-state">Carregando documentos...</p>}
@@ -16,22 +18,33 @@ export default function DocumentList({ documents, isLoading, error, onRetry }) {
       {!isLoading && error && (
         <div className="empty-state error-state">
           <p>{error}</p>
-          <button className="text-button" type="button" onClick={onRetry}>Tentar novamente</button>
+          <button className="text-button" type="button" onClick={onRetry}>
+            Tentar novamente
+          </button>
         </div>
       )}
 
       {!isLoading && !error && documents.length === 0 && (
-        <p className="empty-state">Nenhum documento foi enviado nesta sessão.</p>
+        <p className="empty-state">
+          Nenhum documento foi enviado nesta sessão.
+        </p>
       )}
 
       {!isLoading && !error && documents.length > 0 && (
         <div className="document-list">
           {documents.map((document) => (
             <article className="document-row" key={document.id}>
-              <div className="document-type" aria-hidden="true">DOC</div>
+              <div className="document-type" aria-hidden="true">
+                DOC
+              </div>
               <div className="document-details">
-                <strong title={document.originalName}>{document.originalName}</strong>
-                <span>{document.owner} · {formatDate(document.uploadedAt)} · {formatFileSize(document.size)}</span>
+                <strong title={document.originalName}>
+                  {document.originalName}
+                </strong>
+                <span>
+                  {document.owner} · {formatDate(document.uploadedAt)} ·{" "}
+                  {formatFileSize(document.size)}
+                </span>
               </div>
               <DownloadButton document={document} />
             </article>
@@ -43,8 +56,8 @@ export default function DocumentList({ documents, isLoading, error, onRetry }) {
 }
 
 function formatDate(date) {
-  return new Intl.DateTimeFormat('pt-BR', {
-    dateStyle: 'medium',
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "medium",
   }).format(new Date(date));
 }
 

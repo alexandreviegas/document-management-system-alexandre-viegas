@@ -1,18 +1,21 @@
-import { useState } from 'react';
-import { downloadDocument } from '../services/documentApi';
+import { useState } from "react";
+import { downloadDocument } from "../services/documentApi";
 
 export default function DownloadButton({ document }) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   async function handleDownload() {
     setIsDownloading(true);
-    setError('');
+    setError("");
 
     try {
-      const { blob, filename } = await downloadDocument(document.id, document.originalName);
+      const { blob, filename } = await downloadDocument(
+        document.id,
+        document.originalName,
+      );
       const url = URL.createObjectURL(blob);
-      const link = window.document.createElement('a');
+      const link = window.document.createElement("a");
       link.href = url;
       link.download = filename;
       link.click();
@@ -34,9 +37,13 @@ export default function DownloadButton({ document }) {
         title={`Baixar ${document.originalName}`}
         aria-label={`Baixar ${document.originalName}`}
       >
-        {isDownloading ? '...' : '↓'}
+        {isDownloading ? "..." : "↓"}
       </button>
-      {error && <span className="download-error" role="alert">{error}</span>}
+      {error && (
+        <span className="download-error" role="alert">
+          {error}
+        </span>
+      )}
     </span>
   );
 }

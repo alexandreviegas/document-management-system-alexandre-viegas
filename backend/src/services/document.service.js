@@ -1,4 +1,4 @@
-const fs = require('node:fs/promises');
+const fs = require("node:fs/promises");
 
 class DocumentService {
   constructor(documentRepository) {
@@ -7,18 +7,18 @@ class DocumentService {
 
   createDocument(file, owner) {
     if (!file) {
-      throw this.createError('O campo file é obrigatório.', 400);
+      throw this.createError("O campo file é obrigatório.", 400);
     }
 
-    const normalizedOwner = typeof owner === 'string' ? owner.trim() : '';
+    const normalizedOwner = typeof owner === "string" ? owner.trim() : "";
     if (!normalizedOwner) {
       this.removeUploadedFile(file);
-      throw this.createError('O campo owner é obrigatório.', 400);
+      throw this.createError("O campo owner é obrigatório.", 400);
     }
 
     if (file.size <= 0) {
       this.removeUploadedFile(file);
-      throw this.createError('O arquivo não pode estar vazio.', 400);
+      throw this.createError("O arquivo não pode estar vazio.", 400);
     }
 
     const document = {
@@ -28,7 +28,7 @@ class DocumentService {
       uploadedAt: new Date().toISOString(),
       owner: normalizedOwner,
       storedName: file.filename,
-      mimeType: file.mimetype || 'application/octet-stream',
+      mimeType: file.mimetype || "application/octet-stream",
       storagePath: file.path,
     };
 
@@ -47,11 +47,11 @@ class DocumentService {
   async getDocumentForDownload(id) {
     const document = this.documentRepository.findById(id);
     if (!document) {
-      throw this.createError('Documento não encontrado.', 404);
+      throw this.createError("Documento não encontrado.", 404);
     }
 
     if (!this.documentRepository.fileExists(document)) {
-      throw this.createError('Arquivo do documento não encontrado.', 404);
+      throw this.createError("Arquivo do documento não encontrado.", 404);
     }
 
     const stats = await fs.stat(document.storagePath);

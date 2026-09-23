@@ -8,7 +8,10 @@ class DocumentController {
 
   upload(req, res, next) {
     try {
-      const document = this.documentService.createDocument(req.file, req.body.owner);
+      const document = this.documentService.createDocument(
+        req.file,
+        req.body.owner,
+      );
       const { storagePath, storedName, mimeType, ...metadata } = document;
       res.status(201).json(metadata);
     } catch (error) {
@@ -26,11 +29,12 @@ class DocumentController {
 
   async download(req, res, next) {
     try {
-      const { document, size } = await this.documentService.getDocumentForDownload(req.params.id);
+      const { document, size } =
+        await this.documentService.getDocumentForDownload(req.params.id);
       res.set({
-        'Content-Type': document.mimeType,
-        'Content-Disposition': `attachment; filename="${this.escapeFilename(document.originalName)}"`,
-        'Content-Length': size,
+        "Content-Type": document.mimeType,
+        "Content-Disposition": `attachment; filename="${this.escapeFilename(document.originalName)}"`,
+        "Content-Length": size,
       });
       res.sendFile(document.storagePath, (error) => {
         if (error && !res.headersSent) {
@@ -43,7 +47,7 @@ class DocumentController {
   }
 
   escapeFilename(filename) {
-    return filename.replace(/[\\"\r\n]/g, '_');
+    return filename.replace(/[\\"\r\n]/g, "_");
   }
 }
 

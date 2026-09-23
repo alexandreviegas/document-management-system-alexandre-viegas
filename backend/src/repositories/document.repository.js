@@ -1,4 +1,4 @@
-const fs = require('node:fs');
+const fs = require("node:fs");
 
 class DocumentRepository {
   constructor() {
@@ -13,7 +13,8 @@ class DocumentRepository {
   findAll() {
     return Array.from(this.documents.values())
       .sort((first, second) => {
-        const dateDifference = new Date(second.uploadedAt) - new Date(first.uploadedAt);
+        const dateDifference =
+          new Date(second.uploadedAt) - new Date(first.uploadedAt);
         return dateDifference || first.id.localeCompare(second.id);
       })
       .map(({ storagePath, storedName, mimeType, ...metadata }) => metadata);
